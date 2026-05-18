@@ -1,0 +1,1998 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VENDORA — Yapay Zekâ Destekli Satış Platformu</title>
+<meta name="description" content="Üretin. Yükleyin. Sattırın. AI destekli satış ekibimiz ürününüzü doğru alıcıyla buluşturur." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238b5cf6'/%3E%3Cstop offset='1' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='70' font-family='Space Grotesk,sans-serif' font-size='62' font-weight='700' text-anchor='middle' fill='white'%3EV%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #0a0d1a;
+    --bg-2: #0f1424;
+    --surface: rgba(255, 255, 255, 0.035);
+    --surface-2: rgba(255, 255, 255, 0.06);
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+    --text: #f1f5f9;
+    --text-dim: #94a3b8;
+    --text-muted: #64748b;
+    --primary: #8b5cf6;
+    --primary-2: #6366f1;
+    --accent: #22d3ee;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --gradient-ai: linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #22d3ee 100%);
+    --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+  body::before {
+    content: ""; position: fixed; inset: -200px;
+    background:
+      radial-gradient(circle at 12% 18%, rgba(139,92,246,0.18) 0%, transparent 35%),
+      radial-gradient(circle at 88% 12%, rgba(34,211,238,0.12) 0%, transparent 30%),
+      radial-gradient(circle at 65% 82%, rgba(99,102,241,0.16) 0%, transparent 35%);
+    z-index: -1; animation: float 20s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100% { transform: translate(0,0); } 50% { transform: translate(30px, -20px); } }
+
+  .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar {
+    background: rgba(10,13,26,0.7); backdrop-filter: blur(20px);
+    border-right: 1px solid var(--border);
+    padding: 24px 16px;
+    position: sticky; top: 0; height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 8px 28px; border-bottom: 1px solid var(--border); margin-bottom: 20px;
+  }
+  .brand-logo {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--gradient-ai);
+    display: grid; place-items: center;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 18px;
+    box-shadow: var(--shadow-glow); position: relative;
+  }
+  .brand-logo::after {
+    content: ""; position: absolute; inset: -2px; border-radius: 12px;
+    background: var(--gradient-ai); opacity: 0.4; z-index: -1; filter: blur(8px);
+  }
+  .brand-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 0.5px; }
+  .brand-tag {
+    font-size: 9px; padding: 2px 6px; border-radius: 4px;
+    background: rgba(139,92,246,0.15); color: var(--primary);
+    font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase; margin-left: auto;
+  }
+  .nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .nav-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--text-muted); padding: 12px 12px 6px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 8px;
+    color: var(--text-dim); font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; position: relative;
+  }
+  .nav-item:hover { background: var(--surface); color: var(--text); }
+  .nav-item.active {
+    background: linear-gradient(135deg, rgba(139,92,246,0.18), rgba(99,102,241,0.08));
+    color: var(--text); box-shadow: inset 0 0 0 1px rgba(139,92,246,0.3);
+  }
+  .nav-item.active::before {
+    content: ""; position: absolute; left: -16px; top: 50%;
+    transform: translateY(-50%); width: 3px; height: 18px;
+    background: var(--gradient-ai); border-radius: 0 2px 2px 0;
+  }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-badge {
+    margin-left: auto; font-size: 11px; padding: 2px 7px; border-radius: 10px;
+    background: rgba(34,211,238,0.15); color: var(--accent); font-weight: 600;
+  }
+  .user-card {
+    margin-top: 16px; padding: 12px; border-radius: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--gradient-ai);
+    display: grid; place-items: center; font-weight: 600; font-size: 14px;
+  }
+  .user-info { flex: 1; min-width: 0; }
+  .user-name { font-size: 13px; font-weight: 600; }
+  .user-role { font-size: 11px; color: var(--text-muted); }
+
+  /* Main */
+  .main { padding: 24px 36px 60px; max-width: 1500px; }
+
+  /* Top bar */
+  .topbar { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+  .search {
+    flex: 1; max-width: 540px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px; transition: all 0.2s;
+  }
+  .search:focus-within { border-color: rgba(139,92,246,0.5); box-shadow: 0 0 0 4px rgba(139,92,246,0.1); }
+  .search svg { width: 16px; height: 16px; color: var(--text-muted); }
+  .search input {
+    flex: 1; background: transparent; border: none; outline: none;
+    color: var(--text); font-size: 14px; font-family: inherit;
+  }
+  .search input::placeholder { color: var(--text-muted); }
+  .search-hint {
+    font-size: 11px; padding: 3px 8px; border-radius: 5px;
+    background: rgba(139,92,246,0.12); color: var(--primary); font-weight: 500;
+  }
+  .icon-btn {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--surface); border: 1px solid var(--border);
+    display: grid; place-items: center; cursor: pointer;
+    position: relative; transition: all 0.2s;
+  }
+  .icon-btn:hover { background: var(--surface-2); }
+  .icon-btn svg { width: 18px; height: 18px; color: var(--text-dim); }
+  .notif-dot {
+    position: absolute; top: 9px; right: 10px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 10px var(--accent);
+    animation: pulse 2s infinite;
+  }
+  .waitlist-btn {
+    padding: 10px 16px; border-radius: 10px; cursor: pointer;
+    background: var(--gradient-ai); color: white;
+    font-size: 13px; font-weight: 600; font-family: inherit;
+    border: none; box-shadow: 0 4px 16px rgba(139,92,246,0.4);
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: all 0.2s;
+  }
+  .waitlist-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,92,246,0.55); }
+  .waitlist-btn svg { width: 14px; height: 14px; }
+  @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.3); } }
+
+  /* Hero */
+  .hero { display: grid; grid-template-columns: 1fr 380px; gap: 24px; margin-bottom: 28px; }
+  .hero-welcome {
+    background: linear-gradient(135deg, rgba(139,92,246,0.12) 0%, rgba(34,211,238,0.06) 100%);
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    padding: 28px 32px; position: relative; overflow: hidden;
+  }
+  .hero-welcome::after {
+    content: ""; position: absolute; right: -60px; top: -60px;
+    width: 240px; height: 240px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(139,92,246,0.4), transparent 70%);
+    filter: blur(40px);
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; padding: 5px 10px; border-radius: 100px;
+    background: rgba(139,92,246,0.2); color: var(--primary);
+    font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px;
+  }
+  .hero-eyebrow::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--primary); box-shadow: 0 0 8px var(--primary); animation: pulse 2s infinite;
+  }
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px;
+  }
+  .hero p { color: var(--text-dim); font-size: 14px; margin-bottom: 20px; max-width: 540px; }
+  .hero-actions { display: flex; gap: 10px; position: relative; z-index: 1; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 18px; border-radius: 10px; cursor: pointer;
+    font-size: 13px; font-weight: 600; font-family: inherit;
+    border: none; transition: all 0.2s;
+  }
+  .btn-primary { background: var(--gradient-ai); color: white; box-shadow: 0 4px 20px rgba(139,92,246,0.4); }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 26px rgba(139,92,246,0.55); }
+  .btn-ghost { background: var(--surface-2); color: var(--text); border: 1px solid var(--border-strong); }
+  .btn-ghost:hover { background: var(--surface); }
+  .btn-danger { background: rgba(239,68,68,0.12); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
+  .btn-danger:hover { background: rgba(239,68,68,0.2); }
+
+  /* AI card */
+  .ai-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px; position: relative; overflow: hidden; }
+  .ai-card::before { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, transparent, rgba(34,211,238,0.04)); pointer-events: none; }
+  .ai-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .ai-avatar {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: var(--gradient-ai); position: relative;
+    display: grid; place-items: center; animation: breath 4s ease-in-out infinite;
+  }
+  @keyframes breath {
+    0%,100% { box-shadow: 0 0 24px rgba(139,92,246,0.35); }
+    50% { box-shadow: 0 0 40px rgba(34,211,238,0.55); }
+  }
+  .ai-avatar svg { width: 22px; height: 22px; color: white; }
+  .ai-title { font-size: 14px; font-weight: 600; }
+  .ai-sub { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 6px var(--success); animation: pulse 2s infinite; }
+  .ai-message {
+    font-size: 13px; color: var(--text-dim); line-height: 1.55;
+    padding: 12px 14px; border-radius: 12px;
+    background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+  }
+  .ai-message strong { color: var(--text); font-weight: 600; }
+
+  /* Stats */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; position: relative; overflow: hidden; transition: all 0.2s; }
+  .stat:hover { transform: translateY(-2px); border-color: var(--border-strong); }
+  .stat-icon { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; margin-bottom: 12px; }
+  .stat-icon.violet { background: rgba(139,92,246,0.15); color: var(--primary); }
+  .stat-icon.cyan { background: rgba(34,211,238,0.15); color: var(--accent); }
+  .stat-icon.green { background: rgba(16,185,129,0.15); color: var(--success); }
+  .stat-icon.amber { background: rgba(245,158,11,0.15); color: var(--warning); }
+  .stat-icon svg { width: 18px; height: 18px; }
+  .stat-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; }
+  .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+  .stat-delta { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; margin-top: 8px; padding: 3px 8px; border-radius: 6px; font-weight: 600; }
+  .delta-up { background: rgba(16,185,129,0.12); color: var(--success); }
+  .delta-down { background: rgba(239,68,68,0.12); color: var(--danger); }
+
+  .grid-2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; margin-bottom: 28px; }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; }
+  .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .panel-title { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .panel-title .ai-badge {
+    font-size: 10px; padding: 3px 8px; border-radius: 6px;
+    background: var(--gradient-ai); color: white;
+    font-weight: 700; letter-spacing: 0.4px;
+  }
+  .panel-action { font-size: 12px; color: var(--primary); cursor: pointer; font-weight: 500; }
+
+  .insight {
+    display: flex; gap: 14px; padding: 14px; border-radius: 12px;
+    border: 1px solid var(--border); background: rgba(255,255,255,0.015);
+    transition: all 0.2s; cursor: pointer;
+  }
+  .insight + .insight { margin-top: 10px; }
+  .insight:hover { background: var(--surface-2); border-color: rgba(139,92,246,0.3); }
+  .insight-icon { width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0; display: grid; place-items: center; }
+  .insight-icon.match { background: rgba(139,92,246,0.15); color: var(--primary); }
+  .insight-icon.hot { background: rgba(245,158,11,0.15); color: var(--warning); }
+  .insight-icon.price { background: rgba(34,211,238,0.15); color: var(--accent); }
+  .insight-icon svg { width: 18px; height: 18px; }
+  .insight-content { flex: 1; }
+  .insight-tag { font-size: 10px; padding: 2px 7px; border-radius: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; display: inline-block; margin-bottom: 6px; }
+  .insight-tag.match { background: rgba(139,92,246,0.18); color: var(--primary); }
+  .insight-tag.hot { background: rgba(245,158,11,0.18); color: var(--warning); }
+  .insight-tag.price { background: rgba(34,211,238,0.18); color: var(--accent); }
+  .insight-text { font-size: 13px; color: var(--text); line-height: 1.55; }
+  .insight-text b { color: white; }
+  .insight-meta { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+
+  /* Quick add */
+  .quick-add {
+    background: linear-gradient(135deg, rgba(139,92,246,0.18), rgba(34,211,238,0.08));
+    border: 1px solid rgba(139,92,246,0.35);
+    border-radius: 20px; padding: 24px;
+    position: relative; overflow: hidden;
+  }
+  .quick-add-glow {
+    position: absolute; bottom: -40px; right: -40px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(34,211,238,0.3), transparent 70%);
+    filter: blur(30px);
+  }
+  .quick-add h3 { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; position: relative; z-index: 1; }
+  .quick-add p { color: var(--text-dim); font-size: 13px; margin-bottom: 16px; position: relative; z-index: 1; }
+  .ai-input {
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border-strong);
+    border-radius: 12px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 10px;
+    position: relative; z-index: 1; cursor: pointer;
+  }
+  .ai-input input {
+    flex: 1; background: transparent; border: none; outline: none;
+    color: var(--text); font-size: 14px; font-family: inherit; cursor: pointer;
+  }
+  .ai-input input::placeholder { color: var(--text-muted); }
+  .ai-input .send-btn {
+    width: 34px; height: 34px; border-radius: 8px;
+    background: var(--gradient-ai); border: none; cursor: pointer;
+    display: grid; place-items: center; transition: transform 0.2s;
+  }
+  .ai-input .send-btn:hover { transform: scale(1.05); }
+  .ai-input .send-btn svg { width: 16px; height: 16px; color: white; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; position: relative; z-index: 1; }
+  .chip {
+    font-size: 11px; padding: 5px 10px; border-radius: 100px;
+    background: rgba(255,255,255,0.06); color: var(--text-dim);
+    border: 1px solid var(--border); cursor: pointer; transition: all 0.2s;
+  }
+  .chip:hover { background: rgba(139,92,246,0.15); color: var(--primary); border-color: rgba(139,92,246,0.4); }
+
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+  .section-title { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 600; }
+  .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .filter-pill {
+    font-size: 12px; padding: 6px 12px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-dim); cursor: pointer; font-weight: 500;
+  }
+  .filter-pill.active { background: rgba(139,92,246,0.18); color: var(--primary); border-color: rgba(139,92,246,0.4); }
+
+  .products { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+  .product {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px;
+    transition: all 0.2s; cursor: pointer; position: relative;
+  }
+  .product:hover { transform: translateY(-2px); border-color: var(--border-strong); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+  .product-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .product-cat {
+    font-size: 10px; padding: 3px 8px; border-radius: 5px;
+    background: rgba(34,211,238,0.12); color: var(--accent);
+    font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  .product-score { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: var(--primary); }
+  .product-score svg { width: 12px; height: 12px; }
+  .product-name { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; margin-bottom: 4px; line-height: 1.3; }
+  .product-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5; min-height: 36px; }
+  .product-meta { display: flex; gap: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .meta-item { font-size: 11px; color: var(--text-muted); }
+  .meta-item b { color: var(--text); font-size: 13px; display: block; font-weight: 600; }
+  .product-actions {
+    position: absolute; top: 12px; right: 12px;
+    display: none; gap: 4px;
+  }
+  .product:hover .product-actions { display: flex; }
+  .product-act-btn {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: rgba(0,0,0,0.5); border: 1px solid var(--border-strong);
+    display: grid; place-items: center; cursor: pointer; backdrop-filter: blur(10px);
+  }
+  .product-act-btn:hover { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.4); }
+  .product-act-btn svg { width: 13px; height: 13px; color: var(--text-dim); }
+  .product-act-btn:hover svg { color: var(--danger); }
+  .product .new-badge {
+    position: absolute; top: -6px; left: 14px;
+    font-size: 9px; padding: 3px 8px; border-radius: 100px;
+    background: var(--gradient-ai); color: white; font-weight: 700;
+    letter-spacing: 0.4px; box-shadow: 0 4px 12px rgba(139,92,246,0.5);
+  }
+
+  /* Empty state */
+  .empty {
+    background: var(--surface); border: 1px dashed var(--border-strong);
+    border-radius: 20px; padding: 48px 28px;
+    text-align: center; margin-bottom: 28px;
+  }
+  .empty-icon {
+    width: 64px; height: 64px; border-radius: 16px;
+    background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(34,211,238,0.08));
+    display: grid; place-items: center; margin: 0 auto 16px;
+    border: 1px solid rgba(139,92,246,0.25);
+  }
+  .empty-icon svg { width: 28px; height: 28px; color: var(--primary); }
+  .empty h3 { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+  .empty p { font-size: 13px; color: var(--text-dim); margin-bottom: 20px; max-width: 380px; margin-left: auto; margin-right: auto; }
+  .activity { padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: flex-start; }
+  .activity:last-child { border: none; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+  .activity-content { flex: 1; }
+  .activity-text { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+  .activity-text b { color: var(--text); font-weight: 600; }
+  .activity-time { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+  /* Modals */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.65); backdrop-filter: blur(8px);
+    z-index: 100;
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-backdrop.open { display: flex; animation: fadein 0.25s; }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    background: linear-gradient(180deg, #131830, #0f1424);
+    border: 1px solid var(--border-strong);
+    border-radius: 24px;
+    max-width: 720px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 60px rgba(139,92,246,0.2);
+    animation: slideup 0.3s;
+  }
+  .modal.narrow { max-width: 540px; }
+  @keyframes slideup { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-header {
+    padding: 24px 28px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal-title-wrap { display: flex; align-items: center; gap: 12px; }
+  .modal-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: var(--gradient-ai); display: grid; place-items: center;
+    box-shadow: 0 0 20px rgba(139,92,246,0.4);
+  }
+  .modal-icon svg { width: 20px; height: 20px; color: white; }
+  .modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; }
+  .modal-sub { font-size: 12px; color: var(--text-muted); }
+  .modal-close {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    display: grid; place-items: center; cursor: pointer;
+  }
+  .modal-close svg { width: 14px; height: 14px; }
+  .modal-body { padding: 28px; }
+  .modal-input-area {
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border-strong);
+    border-radius: 14px; padding: 16px; margin-bottom: 20px;
+  }
+  .modal-input-area textarea {
+    width: 100%; background: transparent; border: none; outline: none;
+    color: var(--text); font-size: 14px; font-family: inherit;
+    resize: none; min-height: 64px; line-height: 1.5;
+  }
+  .modal-input-area textarea::placeholder { color: var(--text-muted); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 14px; align-items: center; }
+  .modal-hint { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; flex: 1; }
+  .modal-hint svg { width: 12px; height: 12px; }
+
+  .ai-result { display: none; }
+  .ai-result.show { display: block; animation: fadein 0.4s; }
+  .ai-thinking {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; border-radius: 10px;
+    background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.25);
+    margin-bottom: 16px;
+  }
+  .ai-thinking .dots { display: inline-flex; gap: 4px; }
+  .ai-thinking .dots span {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--primary);
+    animation: bounce 1.2s infinite;
+  }
+  .ai-thinking .dots span:nth-child(2) { animation-delay: 0.15s; }
+  .ai-thinking .dots span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes bounce { 0%,100% { transform: translateY(0); opacity: 0.5; } 50% { transform: translateY(-4px); opacity: 1; } }
+  .ai-thinking-text { font-size: 13px; color: var(--text); }
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .result-field { padding: 14px; border-radius: 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); }
+  .result-field.full { grid-column: 1 / -1; }
+  .result-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text-muted); font-weight: 600; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .result-label .ai-mini {
+    font-size: 9px; padding: 1px 5px; border-radius: 3px;
+    background: var(--gradient-ai); color: white; font-weight: 700;
+  }
+  .result-value { font-size: 14px; color: var(--text); font-weight: 500; }
+  .result-bullets { font-size: 13px; color: var(--text-dim); line-height: 1.7; }
+  .result-bullets li { list-style: none; padding-left: 18px; position: relative; }
+  .result-bullets li::before { content: "→"; position: absolute; left: 0; color: var(--accent); font-weight: 600; }
+  .keywords { display: flex; gap: 6px; flex-wrap: wrap; }
+  .keyword {
+    font-size: 11px; padding: 4px 10px; border-radius: 100px;
+    background: rgba(34,211,238,0.12); color: var(--accent);
+    border: 1px solid rgba(34,211,238,0.25); font-weight: 500;
+  }
+  .commission-slider-wrap {
+    padding: 14px; border-radius: 12px;
+    background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+    grid-column: 1 / -1;
+  }
+  .commission-slider-wrap label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600; }
+  .commission-slider {
+    width: 100%; margin-top: 12px; -webkit-appearance: none; appearance: none;
+    height: 4px; background: var(--border-strong); border-radius: 2px; outline: none;
+  }
+  .commission-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--gradient-ai); cursor: pointer;
+    box-shadow: 0 0 0 4px rgba(139,92,246,0.2);
+  }
+  .commission-value { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; color: var(--primary); margin-top: 6px; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+
+  /* Form fields */
+  .field { margin-bottom: 14px; }
+  .field-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-dim); margin-bottom: 6px; }
+  .field input, .field select {
+    width: 100%; padding: 11px 14px; border-radius: 10px;
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border-strong);
+    color: var(--text); font-size: 14px; font-family: inherit; outline: none;
+    transition: all 0.2s;
+  }
+  .field input:focus, .field select:focus {
+    border-color: rgba(139,92,246,0.5); box-shadow: 0 0 0 4px rgba(139,92,246,0.1);
+  }
+  .field input::placeholder { color: var(--text-muted); }
+
+  /* Onboarding modal */
+  .onboarding-hero {
+    text-align: center; padding: 24px 24px 16px;
+    background: radial-gradient(circle at 50% 0%, rgba(139,92,246,0.18), transparent 70%);
+  }
+  .onboarding-logo {
+    width: 72px; height: 72px; border-radius: 20px;
+    background: var(--gradient-ai); margin: 0 auto 16px;
+    display: grid; place-items: center;
+    font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 700;
+    box-shadow: 0 0 40px rgba(139,92,246,0.4);
+  }
+  .onboarding-hero h2 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+  .onboarding-hero .lead { color: var(--text-dim); font-size: 14px; max-width: 480px; margin: 0 auto; }
+  .onboarding-steps { padding: 24px 28px; display: grid; gap: 14px; }
+  .onb-step {
+    display: flex; gap: 14px; padding: 14px; border-radius: 12px;
+    background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+  }
+  .onb-num {
+    width: 32px; height: 32px; border-radius: 10px; flex-shrink: 0;
+    background: rgba(139,92,246,0.15); color: var(--primary);
+    display: grid; place-items: center; font-weight: 700; font-size: 14px;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .onb-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .onb-content p { font-size: 12px; color: var(--text-dim); line-height: 1.55; }
+  .onb-promise {
+    margin: 0 28px 16px; padding: 14px;
+    background: rgba(34,211,238,0.06); border: 1px solid rgba(34,211,238,0.2);
+    border-radius: 12px; font-size: 12px; color: var(--text-dim); line-height: 1.6;
+    text-align: center; font-style: italic;
+  }
+  .onb-promise b { color: var(--accent); font-style: normal; }
+
+  /* Waitlist success state */
+  .success-state { text-align: center; padding: 16px 16px 0; }
+  .success-icon {
+    width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 16px;
+    background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4);
+    display: grid; place-items: center;
+  }
+  .success-icon svg { width: 30px; height: 30px; color: var(--success); }
+  .success-state h3 { font-family: 'Space Grotesk', sans-serif; font-size: 20px; margin-bottom: 8px; }
+  .success-state p { color: var(--text-dim); font-size: 13px; line-height: 1.6; max-width: 380px; margin: 0 auto 20px; }
+
+  /* Toast */
+  .toast-container {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    z-index: 300; display: flex; flex-direction: column-reverse; gap: 8px;
+    pointer-events: none;
+  }
+  .toast {
+    padding: 12px 18px; border-radius: 12px;
+    background: linear-gradient(135deg, rgba(20,25,50,0.98), rgba(15,20,36,0.98));
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-strong);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.5);
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: var(--text);
+    pointer-events: auto;
+    animation: toastIn 0.3s ease;
+  }
+  .toast.success { border-color: rgba(16,185,129,0.4); }
+  .toast.success .toast-icon { background: rgba(16,185,129,0.2); color: var(--success); }
+  .toast-icon { width: 22px; height: 22px; border-radius: 6px; background: rgba(139,92,246,0.2); color: var(--primary); display: grid; place-items: center; }
+  .toast-icon svg { width: 13px; height: 13px; }
+  @keyframes toastIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .toast.fade { animation: toastOut 0.3s ease forwards; }
+  @keyframes toastOut { to { transform: translateY(20px); opacity: 0; } }
+
+  /* Slogan popup */
+  .slogan-popup {
+    position: fixed; top: 24px; right: 24px;
+    width: 340px;
+    background: linear-gradient(135deg, rgba(20,25,50,0.96), rgba(15,20,36,0.96));
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(139,92,246,0.35);
+    border-radius: 16px; padding: 18px 20px 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.45), 0 0 40px rgba(139,92,246,0.18);
+    z-index: 90;
+    opacity: 0; transform: translateX(50px) scale(0.96);
+    transition: opacity 0.45s cubic-bezier(0.2,0.9,0.3,1),
+                transform 0.45s cubic-bezier(0.2,0.9,0.3,1);
+    pointer-events: none; overflow: hidden;
+  }
+  .slogan-popup.show { opacity: 1; transform: translateX(0) scale(1); pointer-events: auto; }
+  .slogan-popup::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, #8b5cf6, #22d3ee, #8b5cf6);
+    background-size: 200% 100%; animation: shimmer 3s linear infinite;
+  }
+  @keyframes shimmer { 0% { background-position: 0% 0; } 100% { background-position: -200% 0; } }
+  .slogan-head {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 10px; color: var(--text-muted); margin-bottom: 12px;
+    text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600;
+  }
+  .slogan-head .ai-mini {
+    font-size: 9px; padding: 2px 6px; border-radius: 4px;
+    background: var(--gradient-ai); color: white; font-weight: 700; letter-spacing: 0.4px;
+  }
+  .slogan-head .dismiss {
+    margin-left: auto; cursor: pointer; opacity: 0.4;
+    width: 20px; height: 20px; display: grid; place-items: center;
+    border-radius: 5px; transition: all 0.2s;
+  }
+  .slogan-head .dismiss:hover { opacity: 1; background: rgba(255,255,255,0.06); }
+  .slogan-text {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px; line-height: 1.4; font-weight: 600;
+    color: var(--text); margin-bottom: 12px; min-height: 44px;
+  }
+  .slogan-promise {
+    font-size: 11px; color: var(--text-dim);
+    padding-top: 12px; border-top: 1px solid var(--border);
+    font-style: italic; line-height: 1.5;
+    display: flex; align-items: flex-start; gap: 6px;
+  }
+  .slogan-promise::before {
+    content: "\201C";
+    font-family: Georgia, serif; font-size: 22px; line-height: 0.6;
+    color: var(--primary); font-style: normal; flex-shrink: 0;
+  }
+  .slogan-dots { display: flex; gap: 5px; margin-top: 10px; }
+  .slogan-dot {
+    width: 18px; height: 3px; border-radius: 2px;
+    background: rgba(255,255,255,0.12); transition: all 0.4s ease; cursor: pointer;
+  }
+  .slogan-dot.active { background: linear-gradient(90deg, #8b5cf6, #22d3ee); width: 28px; }
+
+  .fade-in { animation: fadein 0.5s; }
+
+  /* Admin panel */
+  .admin-modal .modal { max-width: 880px; }
+  .admin-tabs {
+    display: flex; gap: 4px; padding: 0 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .admin-tab {
+    padding: 12px 16px; font-size: 13px; font-weight: 600;
+    color: var(--text-dim); cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px; transition: all 0.2s;
+  }
+  .admin-tab:hover { color: var(--text); }
+  .admin-tab.active {
+    color: var(--text);
+    border-bottom-color: var(--primary);
+  }
+  .admin-tab .count {
+    margin-left: 6px; font-size: 11px;
+    padding: 2px 7px; border-radius: 100px;
+    background: rgba(139,92,246,0.18); color: var(--primary);
+  }
+  .admin-actions {
+    display: flex; gap: 8px; padding: 0 28px 16px;
+    flex-wrap: wrap;
+  }
+  .admin-btn {
+    padding: 7px 12px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border-strong);
+    color: var(--text); font-size: 12px; font-weight: 500;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    font-family: inherit; transition: all 0.2s;
+  }
+  .admin-btn:hover { background: var(--surface-2); }
+  .admin-btn.danger { color: var(--danger); border-color: rgba(239,68,68,0.3); }
+  .admin-btn.danger:hover { background: rgba(239,68,68,0.1); }
+  .admin-btn svg { width: 13px; height: 13px; }
+  .admin-table-wrap { padding: 0 28px 24px; max-height: 60vh; overflow-y: auto; }
+  .admin-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+  }
+  .admin-table th {
+    text-align: left; padding: 10px 12px;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text-muted); font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0;
+    background: linear-gradient(180deg, #131830, #131830 80%, rgba(19,24,48,0.95));
+    backdrop-filter: blur(8px);
+  }
+  .admin-table td {
+    padding: 12px; border-bottom: 1px solid var(--border);
+    color: var(--text); vertical-align: top;
+  }
+  .admin-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .admin-table .muted { color: var(--text-muted); font-size: 12px; }
+  .admin-table .pill {
+    font-size: 10px; padding: 3px 8px; border-radius: 5px;
+    background: rgba(34,211,238,0.12); color: var(--accent);
+    font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;
+    display: inline-block;
+  }
+  .admin-empty {
+    padding: 60px 20px; text-align: center; color: var(--text-dim);
+    font-size: 14px;
+  }
+  .admin-empty-icon {
+    width: 48px; height: 48px; border-radius: 12px; margin: 0 auto 12px;
+    background: rgba(139,92,246,0.1); color: var(--primary);
+    display: grid; place-items: center;
+  }
+  .admin-empty-icon svg { width: 22px; height: 22px; }
+  .admin-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; margin-top: 8px; border-radius: 8px;
+    background: rgba(34,211,238,0.08); border: 1px solid rgba(34,211,238,0.2);
+    color: var(--accent); font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .admin-link:hover { background: rgba(34,211,238,0.15); }
+  .admin-link svg { width: 14px; height: 14px; }
+  .admin-link .kbd {
+    margin-left: auto; font-size: 10px; padding: 2px 5px;
+    border-radius: 4px; background: rgba(0,0,0,0.3); color: var(--text-dim);
+    font-family: monospace; letter-spacing: 0.5px;
+  }
+  .admin-pane { display: none; }
+  .admin-pane.active { display: block; }
+
+  @media (max-width: 1100px) {
+    .hero, .grid-2 { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .products { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 760px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .main { padding: 20px 16px 40px; }
+    .stats, .products { grid-template-columns: 1fr; }
+    .slogan-popup { right: 12px; left: 12px; width: auto; top: 12px; }
+    .search-hint { display: none; }
+    .topbar { gap: 8px; }
+    .hero h1 { font-size: 22px; }
+    .hero-welcome { padding: 20px; }
+    .result-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">V</div>
+      <div class="brand-name">VENDORA</div>
+      <span class="brand-tag">AI</span>
+    </div>
+
+    <nav class="nav">
+      <span class="nav-label">Ana</span>
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        Pano
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7L12 3 4 7l8 4 8-4z"/><path d="M4 7v10l8 4 8-4V7"/></svg>
+        Ürünlerim
+        <span class="nav-badge" id="navProductCount">0</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Sorgular
+        <span class="nav-badge">8</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        Satış Pipeline
+      </div>
+
+      <span class="nav-label" style="margin-top:14px">Zekâ</span>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        AI Asistan
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        Raporlar
+      </div>
+
+      <span class="nav-label" style="margin-top:14px">Hesap</span>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Ayarlar
+      </div>
+    </nav>
+
+    <div class="user-card">
+      <div class="avatar" id="userAvatar">DÜ</div>
+      <div class="user-info">
+        <div class="user-name" id="userCardName">Demo Üretici</div>
+        <div class="user-role" id="userCardRole">Misafir · Demo Modu</div>
+      </div>
+    </div>
+
+    <div class="admin-link" onclick="openAdmin()" title="Sadece platform sahibi görebilir">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Admin Paneli
+      <span class="kbd">Ctrl+Shift+A</span>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="topbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="AI'a sor: 'bu ay hangi ürünler en çok ilgi gördü?'" />
+        <span class="search-hint">⌘ K</span>
+      </div>
+      <button class="waitlist-btn" onclick="openWaitlist()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Erken Erişim
+      </button>
+      <div class="icon-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </div>
+    </div>
+
+    <section class="hero fade-in">
+      <div class="hero-welcome">
+        <span class="hero-eyebrow">Bugün için AI özetin hazır</span>
+        <h1 id="welcomeHeading">Hoşgeldin 👋</h1>
+        <p>Yapay zeka asistanın gece boyu portföyünü taradı. <b style="color:#fff">3 sıcak fırsat</b>, <b style="color:#fff">12 yeni potansiyel alıcı</b> ve <b style="color:#fff">2 fiyat optimizasyon önerisi</b> tespit etti. Hemen aksiyona geçelim mi?</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="openProductModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            AI ile Ürün Ekle
+          </button>
+          <button class="btn btn-ghost" onclick="openWaitlist()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Erken Erişim Listesine Katıl
+          </button>
+        </div>
+      </div>
+
+      <div class="ai-card">
+        <div class="ai-header">
+          <div class="ai-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v.5A3 3 0 0 0 6 8.5V9a3 3 0 0 0-3 3v.5A3 3 0 0 0 6 15.5V16a3 3 0 0 0 3 3h.5a3 3 0 0 0 3 3 3 3 0 0 0 3-3H15a3 3 0 0 0 3-3v-.5a3 3 0 0 0 3-3V12a3 3 0 0 0-3-3v-.5A3 3 0 0 0 15 5.5V5a3 3 0 0 0-3-3z"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg>
+          </div>
+          <div>
+            <div class="ai-title">AI Asistan</div>
+            <div class="ai-sub"><span class="live-dot"></span> Az önce güncellendi</div>
+          </div>
+        </div>
+        <div class="ai-message" id="aiMessage">
+          Pazartesi sabahı geçen haftaya göre <strong>%23 daha fazla sorgu</strong> akıyor. Bence bugün <strong>"CNC İşlem Merkezi"</strong> ürününüze odaklanın — <strong>İzmir'den 2 alıcı</strong> hafta sonu tekrar incelemiş.
+        </div>
+      </div>
+    </section>
+
+    <section class="stats fade-in">
+      <div class="stat">
+        <div class="stat-icon violet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7L12 3 4 7l8 4 8-4z"/><path d="M4 7v10l8 4 8-4V7"/></svg></div>
+        <div class="stat-label">Aktif Ürünler</div>
+        <div class="stat-value" id="statProducts">0</div>
+        <span class="stat-delta delta-up" id="statProductsDelta">İlk ürününüzü ekleyin</span>
+      </div>
+      <div class="stat">
+        <div class="stat-icon cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <div class="stat-label">Görüntülenme (30g)</div>
+        <div class="stat-value" id="statViews">0</div>
+        <span class="stat-delta delta-up">▲ Yapay zeka aktif</span>
+      </div>
+      <div class="stat">
+        <div class="stat-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <div class="stat-label">Sıcak Fırsatlar</div>
+        <div class="stat-value" id="statHot">0</div>
+        <span class="stat-delta delta-up" id="statHotDelta">Ürün eklediğinizde başlar</span>
+      </div>
+      <div class="stat">
+        <div class="stat-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div class="stat-label">Tahmini Kazanç</div>
+        <div class="stat-value" id="statEarning">₺0</div>
+        <span class="stat-delta delta-up" id="statEarningDelta">Demo modu</span>
+      </div>
+    </section>
+
+    <section class="grid-2 fade-in">
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            Bugünün AI İçgörüleri
+            <span class="ai-badge">AI</span>
+          </div>
+          <span class="panel-action">Tümünü gör →</span>
+        </div>
+
+        <div class="insight">
+          <div class="insight-icon match"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="insight-content">
+            <span class="insight-tag match">%87 Uyum</span>
+            <div class="insight-text">Otomotiv yan sanayi alıcısı <b>Kapasa Endüstri</b> "CNC işleme paketi" araması yaptı. Portföyünüzdeki <b>CNC ürünleri</b> ile yüksek uyum.</div>
+            <div class="insight-meta">22 dakika önce · Tahmini deal: ₺380.000</div>
+          </div>
+        </div>
+
+        <div class="insight">
+          <div class="insight-icon hot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></div>
+          <div class="insight-content">
+            <span class="insight-tag hot">Sıcak Fırsat</span>
+            <div class="insight-text">Ankara'dan bir alıcı <b>"Endüstriyel Kompresör"</b> sorgusu açtı. Ekibimiz teklif aşamasında, 48 saat içinde dönüş bekleniyor.</div>
+            <div class="insight-meta">1 saat önce · Ahmet K. takip ediyor</div>
+          </div>
+        </div>
+
+        <div class="insight">
+          <div class="insight-icon price"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div class="insight-content">
+            <span class="insight-tag price">Fiyat Önerisi</span>
+            <div class="insight-text">Sektör verilerine göre ürün fiyat aralığınızı <b>%5-12 optimize</b> ederseniz aylık dönüşüm tahminen <b>2.4x</b> artar.</div>
+            <div class="insight-meta">Bu sabah analiz edildi · Detayları gör</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-add">
+        <div class="quick-add-glow"></div>
+        <h3>30 saniyede ürün ekle</h3>
+        <p>Sadece tek cümlede anlat. AI gerisini halleder: kategori, açıklama, hedef alıcı profili, satış pitch'i.</p>
+        <div class="ai-input" onclick="openProductModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <input type="text" placeholder="örn: tek kişilik metal sandalye, restoranlar için..." readonly />
+          <button class="send-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+        <div class="chips">
+          <span class="chip" onclick="openProductModalWith('Endüstriyel hidrolik silindir, 100mm çap, 500mm strok')">⚙ Hidrolik silindir</span>
+          <span class="chip" onclick="openProductModalWith('Restoran tipi metal sandalye, çelik konstrüksiyon')">🪑 Çelik sandalye</span>
+          <span class="chip" onclick="openProductModalWith('PLC tabanlı kontrol panosu, 24V, IP65')">📟 Kontrol panosu</span>
+        </div>
+      </div>
+
+    </section>
+
+    <div class="section-header">
+      <div class="section-title">Ürün Portföyünüz</div>
+      <div class="filter-pills">
+        <span class="filter-pill active" id="filterAll">Tümü · <span id="filterAllCount">0</span></span>
+        <span class="filter-pill">Yeni · <span id="filterNewCount">0</span></span>
+      </div>
+    </div>
+
+    <section id="productsSection"></section>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Son Aktiviteler</div>
+        <span class="panel-action">Tümü →</span>
+      </div>
+      <div id="activityFeed">
+        <div class="activity">
+          <div class="activity-dot" style="background:#22d3ee;box-shadow:0 0 8px #22d3ee"></div>
+          <div class="activity-content">
+            <div class="activity-text"><b>VENDORA</b> erken erişim moduna hoş geldiniz. Demo ortamı aktif, gerçek müşteriler için listeye kaydolun.</div>
+            <div class="activity-time">Şimdi</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Slogan popup -->
+<div class="slogan-popup" id="sloganPopup">
+  <div class="slogan-head">
+    <span class="ai-mini">AI</span>
+    VENDORA SÖZÜMÜZ
+    <span class="dismiss" onclick="dismissSlogan()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </span>
+  </div>
+  <div class="slogan-text" id="sloganText">Yapay zekâ ve satış ekibimiz, ürününüzü tanıyana götürür.</div>
+  <div class="slogan-dots">
+    <span class="slogan-dot active" data-i="0" onclick="jumpSlogan(0)"></span>
+    <span class="slogan-dot" data-i="1" onclick="jumpSlogan(1)"></span>
+    <span class="slogan-dot" data-i="2" onclick="jumpSlogan(2)"></span>
+  </div>
+  <div class="slogan-promise">Satış sözü vermiyoruz — ama elimizden geleni yapacağımızı vaad ediyoruz.</div>
+</div>
+
+<!-- AI Product Add Modal -->
+<div class="modal-backdrop" id="productModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <div class="modal-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11H1v10h8V11zM23 1h-8v10h8V1zM23 14h-8v7h8v-7zM9 1H1v7h8V1z"/></svg></div>
+        <div>
+          <div class="modal-title">AI ile Yeni Ürün</div>
+          <div class="modal-sub">Tek cümle yaz, AI gerisini halletsin</div>
+        </div>
+      </div>
+      <div class="modal-close" onclick="closeProductModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <div class="modal-input-area">
+        <textarea id="aiInput" placeholder="Ürününüzü kısaca anlatın... örn: tek kişilik metal sandalye, çelik konstrüksiyon, restoranlar için"></textarea>
+        <div class="modal-actions">
+          <span class="modal-hint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            AI saniyeler içinde tüm alanları doldurur — siz onaylar ve yayına alırsınız.
+          </span>
+          <button class="btn btn-primary" onclick="runAI()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            AI'ı Çalıştır
+          </button>
+        </div>
+      </div>
+
+      <div id="aiThinking" class="ai-thinking" style="display:none">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="ai-thinking-text">AI ürün bilgilerini hazırlıyor...</span>
+      </div>
+
+      <div id="aiResult" class="ai-result">
+        <div style="font-size:13px;color:var(--text-dim);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <strong style="color:var(--text)">AI tüm alanları doldurdu.</strong> Gözden geçirip yayına alabilirsiniz.
+        </div>
+
+        <div class="result-grid">
+          <div class="result-field full">
+            <div class="result-label">Ürün Adı <span class="ai-mini">AI</span></div>
+            <div class="result-value" id="r-name"></div>
+          </div>
+          <div class="result-field">
+            <div class="result-label">Kategori <span class="ai-mini">AI</span></div>
+            <div class="result-value" id="r-cat"></div>
+          </div>
+          <div class="result-field">
+            <div class="result-label">Önerilen Fiyat <span class="ai-mini">AI</span></div>
+            <div class="result-value" id="r-price"></div>
+          </div>
+          <div class="result-field full">
+            <div class="result-label">Hedef Alıcı Profili <span class="ai-mini">AI</span></div>
+            <div class="result-value" id="r-buyer"></div>
+          </div>
+          <div class="result-field full">
+            <div class="result-label">Satış Pitch Maddeleri <span class="ai-mini">AI</span></div>
+            <ul class="result-bullets" id="r-bullets"></ul>
+          </div>
+          <div class="result-field full">
+            <div class="result-label">Otomatik Anahtar Kelimeler <span class="ai-mini">AI</span></div>
+            <div class="keywords" id="r-keywords"></div>
+          </div>
+          <div class="commission-slider-wrap">
+            <label>Önereceğiniz Satış Komisyonu</label>
+            <input type="range" class="commission-slider" id="commissionSlider" min="3" max="20" value="10" step="1" />
+            <div class="commission-value"><span id="commissionValue">10</span>%</div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeProductModal()">Vazgeç</button>
+          <button class="btn btn-primary" onclick="saveProduct()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Yayına Al
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Waitlist Modal -->
+<div class="modal-backdrop" id="waitlistModal">
+  <div class="modal narrow">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <div class="modal-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+        <div>
+          <div class="modal-title">Erken Erişim Listesi</div>
+          <div class="modal-sub">İlk 50 üretici için ücretsiz kullanım + 6 ay sıfır komisyon</div>
+        </div>
+      </div>
+      <div class="modal-close" onclick="closeWaitlist()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <div id="waitlistForm">
+        <div class="field">
+          <label class="field-label">Ad Soyad veya Firma Adı</label>
+          <input type="text" id="wlName" placeholder="örn: Selçuk Derse / ABC Makine A.Ş." />
+        </div>
+        <div class="field">
+          <label class="field-label">E-posta</label>
+          <input type="email" id="wlEmail" placeholder="ornek@firma.com" required />
+        </div>
+        <div class="field">
+          <label class="field-label">Sektör</label>
+          <select id="wlSector">
+            <option value="">Seçiniz...</option>
+            <option value="makine">Makine & Ekipman</option>
+            <option value="otomotiv">Otomotiv Yan Sanayi</option>
+            <option value="mobilya">Mobilya & Dekorasyon</option>
+            <option value="tekstil">Tekstil & Konfeksiyon</option>
+            <option value="gida">Gıda & İçecek</option>
+            <option value="insaat">İnşaat Malzemeleri</option>
+            <option value="elektronik">Elektrik & Elektronik</option>
+            <option value="kozmetik">Kozmetik & Kişisel Bakım</option>
+            <option value="hizmet">Hizmet & Danışmanlık</option>
+            <option value="diger">Diğer</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label">Telefon (opsiyonel)</label>
+          <input type="tel" id="wlPhone" placeholder="+90 5XX XXX XX XX" />
+        </div>
+
+        <div style="padding:14px;border-radius:12px;background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.2);margin-top:8px">
+          <div style="font-size:12px;color:var(--text-dim);line-height:1.6">
+            <strong style="color:var(--accent)">İlk 50 üretici için özel:</strong> 6 ay sıfır komisyon, kişisel onboarding, satış ekibimizden öncelikli takip.
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeWaitlist()">Vazgeç</button>
+          <button class="btn btn-primary" onclick="submitWaitlist()" id="wlSubmit">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Listeye Katıl
+          </button>
+        </div>
+      </div>
+
+      <div id="waitlistSuccess" style="display:none">
+        <div class="success-state">
+          <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h3>Listemize katıldınız!</h3>
+          <p>Onay e-postası gönderildi. İlk 50 üreticiden biriyseniz, 48 saat içinde size özel onboarding linki ulaşacak.</p>
+          <p style="font-style:italic;color:var(--accent);font-size:12px">"Satış sözü vermiyoruz — ama elimizden geleni yapacağımızı vaad ediyoruz."</p>
+          <button class="btn btn-primary" onclick="closeWaitlist()" style="margin-top:8px">Tamam</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Onboarding Modal -->
+<div class="modal-backdrop" id="onboardingModal">
+  <div class="modal">
+    <div class="onboarding-hero">
+      <div class="onboarding-logo">V</div>
+      <h2>VENDORA'ya hoşgeldin</h2>
+      <p class="lead">Yapay zekâ destekli B2B satış platformu. Üreticiler ürününü yükler, AI + satış ekibimiz doğru alıcıyla buluşturur.</p>
+    </div>
+
+    <div class="onboarding-steps">
+      <div class="onb-step">
+        <div class="onb-num">1</div>
+        <div class="onb-content">
+          <h4>Ürününüzü 30 saniyede ekleyin</h4>
+          <p>Tek cümle yazın — AI kategori, fiyat, hedef alıcı profili ve satış pitch'inizi otomatik hazırlar.</p>
+        </div>
+      </div>
+      <div class="onb-step">
+        <div class="onb-num">2</div>
+        <div class="onb-content">
+          <h4>Satış ekibimiz sahaya iner</h4>
+          <p>AI destekli satış mühendislerimiz ürününüzü doğru sektörel alıcılara taşır. Siz sadece üretmeye odaklanın.</p>
+        </div>
+      </div>
+      <div class="onb-step">
+        <div class="onb-num">3</div>
+        <div class="onb-content">
+          <h4>Sadece satışta ödersiniz</h4>
+          <p>Üyelik ücretsiz, abonelik yok. Komisyonumuz yalnızca biz satışı kapattığımızda — şeffaf, risk yok.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="onb-promise">
+      <b>Sözümüz</b> &mdash; Satış garantisi vermiyoruz, ama elimizden geleni yapacağımıza söz veriyoruz.
+    </div>
+
+    <div style="padding: 0 28px 24px; display:flex; gap:10px">
+      <button class="btn btn-ghost" style="flex:1" onclick="closeOnboarding(); openProductModal();">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Demo'yu Dene
+      </button>
+      <button class="btn btn-primary" style="flex:1" onclick="closeOnboarding(); openWaitlist();">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Erken Erişim Listesine Katıl
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Panel Modal -->
+<div class="modal-backdrop admin-modal" id="adminModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <div class="modal-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div>
+          <div class="modal-title">Admin Paneli</div>
+          <div class="modal-sub">Yalnızca platform sahibi · Bu sekme açan tarayıcıda saklanan veri</div>
+        </div>
+      </div>
+      <div class="modal-close" onclick="closeAdmin()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+
+    <div class="admin-tabs">
+      <div class="admin-tab active" onclick="switchAdminTab('waitlist')" id="tab-waitlist">
+        Waitlist Kayıtları
+        <span class="count" id="adminWaitlistCount">0</span>
+      </div>
+      <div class="admin-tab" onclick="switchAdminTab('products')" id="tab-products">
+        Eklenmiş Ürünler
+        <span class="count" id="adminProductsCount">0</span>
+      </div>
+    </div>
+
+    <div class="admin-actions">
+      <button class="admin-btn" onclick="exportCSV()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        CSV Olarak İndir
+      </button>
+      <button class="admin-btn" onclick="copyAllEmails()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Tüm Email'leri Kopyala
+      </button>
+      <button class="admin-btn" onclick="refreshAdmin()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Yenile
+      </button>
+      <button class="admin-btn danger" onclick="clearAdminData()" style="margin-left:auto">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>
+        Tüm Veriyi Sıfırla
+      </button>
+    </div>
+
+    <!-- Waitlist pane -->
+    <div class="admin-pane active" id="pane-waitlist">
+      <div class="admin-table-wrap" id="adminWaitlistTable"></div>
+    </div>
+
+    <!-- Products pane -->
+    <div class="admin-pane" id="pane-products">
+      <div class="admin-table-wrap" id="adminProductsTable"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+  // ===== STATE =====
+  const STORAGE_KEY = 'vendora_products_v1';
+  const ONBOARDING_KEY = 'vendora_onboarded_v1';
+  const WAITLIST_KEY = 'vendora_waitlist_v1';
+  const USER_NAME_KEY = 'vendora_user_name_v1';
+
+  // Formspree endpoint — waitlist kayıtları buraya POST edilir
+  const WAITLIST_ENDPOINT = 'https://formspree.io/f/mwvzppgd';
+
+  function loadProducts() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch(e) { return []; }
+  }
+  function saveProducts(arr) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  }
+  let products = loadProducts();
+
+  // ===== AI PRESETS =====
+  const presets = {
+    hidrolik: {
+      cat: 'Hidrolik & Pnömatik › Silindir',
+      catShort: 'HİDROLİK',
+      price: '₺2.400 – ₺3.200 / adet',
+      priceNum: 2800,
+      buyer: 'OEM makine üreticileri · Tekstil makinesi imalatçıları · Pres atölyeleri',
+      bullets: [
+        '160 bar çalışma basıncı, hassas tolerans (H8/f7)',
+        'Krom kaplama mil, NBR/Viton conta seçeneği',
+        '2 hafta hızlı üretim, CE belgeli'
+      ],
+      keywords: ['hidrolik silindir','endüstriyel silindir','100mm silindir','pres silindiri','krom kaplama mil']
+    },
+    sandalye: {
+      cat: 'Mobilya › Endüstriyel › Sandalye',
+      catShort: 'MOBİLYA',
+      price: '₺680 – ₺950 / adet',
+      priceNum: 815,
+      buyer: 'Restoran zincirleri · Kafe işletmecileri · Otel projeleri · Toplu yemek tesisleri',
+      bullets: [
+        'Çelik konstrüksiyon — yoğun ticari kullanıma dayanıklı, 5 yıl garantili',
+        'Yüksek-yığma tasarım — depolama alanı %60 daha verimli',
+        'Toplu siparişlerde 7-10 iş günü teslim, özel renk seçeneği'
+      ],
+      keywords: ['metal sandalye','restoran mobilyası','endüstriyel sandalye','çelik sandalye','ticari sandalye']
+    },
+    plc: {
+      cat: 'Otomasyon › Kontrol Panosu',
+      catShort: 'OTOMASYON',
+      price: '₺18.500 – ₺36.000 / pano',
+      priceNum: 27250,
+      buyer: 'Üretim hattı entegratörleri · OSB firmaları · Su arıtma tesisleri',
+      bullets: [
+        'Siemens / Schneider PLC desteği, modüler tasarım',
+        'IP65 koruma sınıfı — toz/su sızdırmaz, fabrika ortamına uygun',
+        'TS EN 61439 sertifikalı, 2 yıl garanti'
+      ],
+      keywords: ['plc panosu','kontrol panosu','otomasyon panosu','endüstriyel pano','siemens plc']
+    },
+    cnc: {
+      cat: 'CNC & Makine İşleme',
+      catShort: 'CNC',
+      price: '₺285.000 – ₺420.000',
+      priceNum: 352500,
+      buyer: 'Otomotiv yan sanayi · Makine imalatı · Yedek parça üreticileri',
+      bullets: [
+        '3 eksen hassas işleme, ±0.01mm tolerans',
+        'Otomatik takım değiştirici, 24 takım kapasiteli',
+        'Siemens 828D kontrol, 12 ay servis garantisi'
+      ],
+      keywords: ['cnc torna','cnc işleme','otomotiv işleme','hassas torna','siemens cnc']
+    },
+    kompresor: {
+      cat: 'Endüstriyel Ekipman › Kompresör',
+      catShort: 'KOMPRESÖR',
+      price: '₺145.000 – ₺195.000',
+      priceNum: 170000,
+      buyer: 'Fabrika işletmeleri · Atölyeler · OSB firmaları · İnşaat sektörü',
+      bullets: [
+        '11 kW vidalı tip, sessiz çalışma (68 dB)',
+        'Enerji verimli sürücü, %25 daha az tüketim',
+        'Türkiye geneli 7/24 servis ağı, 5 yıl garanti'
+      ],
+      keywords: ['kompresör 11kw','vidalı kompresör','endüstriyel kompresör','sessiz kompresör','fabrika kompresörü']
+    },
+    sogutma: {
+      cat: 'Soğutma Sistemleri',
+      catShort: 'SOĞUTMA',
+      price: '₺78.000 – ₺125.000',
+      priceNum: 101500,
+      buyer: 'Plastik üreticileri · Gıda işleme · Tekstil boyahaneleri',
+      bullets: [
+        '10 ton soğutma kapasitesi, kapalı devre sistem',
+        'Otomatik enerji yönetimi, sezona göre kademeli çalışma',
+        'Galvaniz kasa, 10 yıl korozyon garantisi'
+      ],
+      keywords: ['soğutma kulesi','endüstriyel soğutma','10 ton soğutma','proses soğutma','kapalı devre']
+    },
+    generic: {
+      cat: 'Genel Üretim',
+      catShort: 'GENEL',
+      price: 'Fiyat aralığı belirleniyor',
+      priceNum: 0,
+      buyer: 'Sektörel B2B alıcılar · Toptan dağıtıcılar · OEM müşteriler',
+      bullets: [
+        'Yüksek kalite standartları, sertifikalı üretim',
+        'Türkiye geneli teslimat, hızlı sevkiyat',
+        'Toplu siparişlerde özel fiyatlama'
+      ],
+      keywords: ['toptan','b2b','endüstriyel','türkiye üretimi','kaliteli']
+    }
+  };
+
+  function pickPreset(text) {
+    const t = text.toLowerCase();
+    if (t.match(/hidrolik|silindir/)) return presets.hidrolik;
+    if (t.match(/sandalye|koltuk|masa|mobil/)) return presets.sandalye;
+    if (t.match(/plc|pano|kontrol|otomasyon/)) return presets.plc;
+    if (t.match(/cnc|torna|freze/)) return presets.cnc;
+    if (t.match(/kompresör|hava/)) return presets.kompresor;
+    if (t.match(/soğut|kule|chiller/)) return presets.sogutma;
+    return presets.generic;
+  }
+
+  function genName(text, preset) {
+    const t = text.trim();
+    if (t.length < 5) return preset.catShort + ' Ürünü';
+    const words = t.split(/\s+/).slice(0, 6).join(' ');
+    return words.charAt(0).toUpperCase() + words.slice(1);
+  }
+
+  function genScore() { return (7.5 + Math.random() * 2).toFixed(1); }
+  function genViews() { return Math.floor(50 + Math.random() * 250); }
+  function genInquiries() { return Math.floor(Math.random() * 6); }
+
+  // ===== RENDER =====
+  function renderAll() {
+    renderProducts();
+    renderStats();
+  }
+
+  function renderProducts() {
+    const section = document.getElementById('productsSection');
+    if (products.length === 0) {
+      section.className = '';
+      section.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7L12 3 4 7l8 4 8-4z"/><path d="M4 7v10l8 4 8-4V7"/></svg>
+          </div>
+          <h3>Henüz ürün eklemediniz</h3>
+          <p>İlk ürününüzü ekleyin — AI 30 saniyede kategori, fiyat, hedef alıcı ve satış pitch'inizi otomatik üretsin.</p>
+          <button class="btn btn-primary" onclick="openProductModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            İlk Ürünümü Ekle
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    section.className = 'products fade-in';
+    section.innerHTML = products.map(p => `
+      <div class="product" data-id="${p.id}">
+        ${p.isNew ? '<span class="new-badge">YENİ</span>' : ''}
+        <div class="product-actions">
+          <div class="product-act-btn" onclick="event.stopPropagation(); deleteProduct('${p.id}')" title="Sil">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6m5 0V4a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v2"/></svg>
+          </div>
+        </div>
+        <div class="product-header">
+          <span class="product-cat">${escapeHtml(p.catShort)}</span>
+          <span class="product-score">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            ${p.score}
+          </span>
+        </div>
+        <div class="product-name">${escapeHtml(p.name)}</div>
+        <div class="product-desc">${escapeHtml(p.desc)}</div>
+        <div class="product-meta">
+          <div class="meta-item">Görüntülenme<b>${p.views}</b></div>
+          <div class="meta-item">Sorgu<b>${p.inquiries}</b></div>
+          <div class="meta-item">Komisyon<b>%${p.commission}</b></div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderStats() {
+    const count = products.length;
+    const totalViews = products.reduce((s,p) => s + p.views, 0);
+    const totalInquiries = products.reduce((s,p) => s + p.inquiries, 0);
+    const newCount = products.filter(p => p.isNew).length;
+    const estEarning = products.reduce((s,p) => s + (p.priceNum * p.commission / 100 * 0.3), 0);
+
+    document.getElementById('statProducts').textContent = count;
+    document.getElementById('navProductCount').textContent = count;
+    document.getElementById('filterAllCount').textContent = count;
+    document.getElementById('filterNewCount').textContent = newCount;
+    document.getElementById('statViews').textContent = totalViews.toLocaleString('tr-TR');
+    document.getElementById('statHot').textContent = totalInquiries;
+    const earningK = Math.round(estEarning / 1000);
+    document.getElementById('statEarning').textContent = earningK > 0 ? '₺' + earningK + 'K' : '₺0';
+
+    const dEl = document.getElementById('statProductsDelta');
+    if (count === 0) dEl.textContent = 'İlk ürününüzü ekleyin';
+    else if (count === 1) dEl.textContent = '1 yayında';
+    else dEl.textContent = '+ ' + newCount + ' yeni';
+
+    const hEl = document.getElementById('statHotDelta');
+    if (totalInquiries === 0) hEl.textContent = 'Ürün eklediğinizde başlar';
+    else hEl.textContent = totalInquiries + ' aktif sorgu';
+
+    const eEl = document.getElementById('statEarningDelta');
+    if (earningK === 0) eEl.textContent = 'Demo modu';
+    else eEl.textContent = 'AI tahmini';
+  }
+
+  function escapeHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // ===== PRODUCT MODAL =====
+  let currentDraft = null;
+
+  function openProductModal() {
+    document.getElementById('productModal').classList.add('open');
+    setTimeout(() => document.getElementById('aiInput').focus(), 100);
+  }
+  function openProductModalWith(text) {
+    document.getElementById('aiInput').value = text;
+    openProductModal();
+  }
+  function closeProductModal() {
+    document.getElementById('productModal').classList.remove('open');
+    document.getElementById('aiResult').classList.remove('show');
+    document.getElementById('aiThinking').style.display = 'none';
+    document.getElementById('aiInput').value = '';
+    currentDraft = null;
+  }
+  document.getElementById('productModal').addEventListener('click', (e) => {
+    if (e.target.id === 'productModal') closeProductModal();
+  });
+
+  function runAI() {
+    const input = document.getElementById('aiInput').value.trim();
+    if (!input) {
+      showToast('Lütfen ürününüzü tanımlayın', 'info');
+      return;
+    }
+    document.getElementById('aiResult').classList.remove('show');
+    document.getElementById('aiThinking').style.display = 'flex';
+
+    const preset = pickPreset(input);
+    const name = genName(input, preset);
+    const score = genScore();
+    const views = genViews();
+    const inquiries = genInquiries();
+
+    currentDraft = {
+      input, preset, name, score, views, inquiries,
+      desc: input.charAt(0).toUpperCase() + input.slice(1)
+    };
+
+    setTimeout(() => {
+      document.getElementById('r-name').textContent = name;
+      document.getElementById('r-cat').textContent = preset.cat;
+      document.getElementById('r-price').textContent = preset.price;
+      document.getElementById('r-buyer').textContent = preset.buyer;
+      document.getElementById('r-bullets').innerHTML = preset.bullets.map(b => `<li>${escapeHtml(b)}</li>`).join('');
+      document.getElementById('r-keywords').innerHTML = preset.keywords.map(k => `<span class="keyword">${escapeHtml(k)}</span>`).join('');
+      document.getElementById('commissionSlider').value = 10;
+      document.getElementById('commissionValue').textContent = 10;
+      document.getElementById('aiThinking').style.display = 'none';
+      document.getElementById('aiResult').classList.add('show');
+    }, 1500);
+  }
+
+  document.getElementById('commissionSlider').addEventListener('input', (e) => {
+    document.getElementById('commissionValue').textContent = e.target.value;
+  });
+
+  function saveProduct() {
+    if (!currentDraft) return;
+    const commission = parseInt(document.getElementById('commissionSlider').value);
+    const newProduct = {
+      id: 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+      name: currentDraft.name,
+      desc: currentDraft.desc,
+      catShort: currentDraft.preset.catShort,
+      cat: currentDraft.preset.cat,
+      price: currentDraft.preset.price,
+      priceNum: currentDraft.preset.priceNum,
+      buyer: currentDraft.preset.buyer,
+      bullets: currentDraft.preset.bullets,
+      keywords: currentDraft.preset.keywords,
+      commission,
+      score: currentDraft.score,
+      views: currentDraft.views,
+      inquiries: currentDraft.inquiries,
+      isNew: true,
+      createdAt: Date.now()
+    };
+    products.unshift(newProduct);
+    if (products.length > 12) products = products.slice(0, 12);
+    saveProducts(products);
+    renderAll();
+    addActivity(`<b>Yeni ürün yayında:</b> ${escapeHtml(currentDraft.name)}. AI 30 saniyede tüm bilgileri hazırladı.`, '#8b5cf6');
+    closeProductModal();
+    showToast('Ürününüz yayına alındı', 'success');
+
+    // Mark not-new after a moment
+    setTimeout(() => {
+      const p = products.find(x => x.id === newProduct.id);
+      if (p) { p.isNew = false; saveProducts(products); renderProducts(); }
+    }, 60000);
+  }
+
+  function deleteProduct(id) {
+    if (!confirm('Bu ürünü silmek istediğinize emin misiniz?')) return;
+    const p = products.find(x => x.id === id);
+    products = products.filter(x => x.id !== id);
+    saveProducts(products);
+    renderAll();
+    if (p) addActivity(`<b>Ürün kaldırıldı:</b> ${escapeHtml(p.name)}`, '#ef4444');
+    showToast('Ürün kaldırıldı', 'success');
+  }
+
+  // ===== WAITLIST =====
+  function openWaitlist() {
+    document.getElementById('waitlistForm').style.display = '';
+    document.getElementById('waitlistSuccess').style.display = 'none';
+    document.getElementById('waitlistModal').classList.add('open');
+    setTimeout(() => document.getElementById('wlName').focus(), 100);
+  }
+  function closeWaitlist() {
+    document.getElementById('waitlistModal').classList.remove('open');
+  }
+  document.getElementById('waitlistModal').addEventListener('click', (e) => {
+    if (e.target.id === 'waitlistModal') closeWaitlist();
+  });
+
+  async function submitWaitlist() {
+    const name = document.getElementById('wlName').value.trim();
+    const email = document.getElementById('wlEmail').value.trim();
+    const sector = document.getElementById('wlSector').value;
+    const phone = document.getElementById('wlPhone').value.trim();
+
+    if (!email || !email.includes('@')) {
+      showToast('Geçerli bir email adresi girin', 'info');
+      return;
+    }
+
+    const btn = document.getElementById('wlSubmit');
+    btn.disabled = true;
+    btn.innerHTML = '<span style="opacity:0.7">Gönderiliyor...</span>';
+
+    const payload = { name, email, sector, phone, ts: new Date().toISOString(), source: 'vendora-demo' };
+
+    // Save to localStorage first (always works)
+    try {
+      const arr = JSON.parse(localStorage.getItem(WAITLIST_KEY) || '[]');
+      arr.push(payload);
+      localStorage.setItem(WAITLIST_KEY, JSON.stringify(arr));
+      // Save user's name for personalization
+      if (name) {
+        localStorage.setItem(USER_NAME_KEY, name);
+        applyPersonalization();
+      }
+    } catch(e) {}
+
+    // POST to remote endpoint if configured
+    if (WAITLIST_ENDPOINT) {
+      try {
+        await fetch(WAITLIST_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch(e) {
+        // Silently fall back to local-only storage
+      }
+    }
+
+    setTimeout(() => {
+      document.getElementById('waitlistForm').style.display = 'none';
+      document.getElementById('waitlistSuccess').style.display = 'block';
+      addActivity(`<b>Erken erişim listesine yeni kayıt:</b> ${escapeHtml(name || email)}`, '#10b981');
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Listeye Katıl';
+      ['wlName','wlEmail','wlSector','wlPhone'].forEach(id => document.getElementById(id).value = '');
+    }, 600);
+  }
+
+  // ===== ONBOARDING =====
+  function showOnboarding() {
+    document.getElementById('onboardingModal').classList.add('open');
+  }
+  function closeOnboarding() {
+    document.getElementById('onboardingModal').classList.remove('open');
+    localStorage.setItem(ONBOARDING_KEY, '1');
+  }
+
+  // ===== ACTIVITY FEED =====
+  function addActivity(html, color) {
+    const feed = document.getElementById('activityFeed');
+    const node = document.createElement('div');
+    node.className = 'activity';
+    node.innerHTML = `
+      <div class="activity-dot" style="background:${color};box-shadow:0 0 8px ${color}"></div>
+      <div class="activity-content">
+        <div class="activity-text">${html}</div>
+        <div class="activity-time">Az önce</div>
+      </div>
+    `;
+    feed.insertBefore(node, feed.firstChild);
+    const items = feed.querySelectorAll('.activity');
+    if (items.length > 6) items[items.length - 1].remove();
+  }
+
+  // ===== TOAST =====
+  function showToast(msg, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.innerHTML = `
+      <div class="toast-icon">
+        ${type === 'success'
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'}
+      </div>
+      <span>${escapeHtml(msg)}</span>
+    `;
+    container.appendChild(t);
+    setTimeout(() => { t.classList.add('fade'); setTimeout(() => t.remove(), 300); }, 3000);
+  }
+
+  // ===== SLOGAN POPUP =====
+  const slogans = [
+    "Yapay zekâ ve satış ekibimiz, ürününüzü tanıyana götürür.",
+    "Sıfır ücret. Sıfır risk. Sattığımızda komisyon alırız.",
+    "Stoklarınız değil, satışlarınız büyüsün."
+  ];
+  let sloganIdx = 0;
+  let sloganTimer = null;
+  const sloganPopup = document.getElementById('sloganPopup');
+  const sloganTextEl = document.getElementById('sloganText');
+  const sloganDots = document.querySelectorAll('.slogan-dot');
+
+  function renderSlogan(idx) {
+    sloganTextEl.textContent = slogans[idx];
+    sloganDots.forEach((d, i) => d.classList.toggle('active', i === idx));
+  }
+  function showSlogan() { sloganPopup.classList.add('show'); }
+  function hideSlogan() { sloganPopup.classList.remove('show'); }
+  function dismissSlogan() { hideSlogan(); if (sloganTimer) clearInterval(sloganTimer); }
+  function jumpSlogan(i) {
+    sloganIdx = i; renderSlogan(sloganIdx); showSlogan(); restartSloganCycle();
+  }
+  function restartSloganCycle() {
+    if (sloganTimer) clearInterval(sloganTimer);
+    sloganTimer = setInterval(cycleSlogan, 6500);
+  }
+  function cycleSlogan() {
+    hideSlogan();
+    setTimeout(() => {
+      sloganIdx = (sloganIdx + 1) % slogans.length;
+      renderSlogan(sloganIdx);
+      showSlogan();
+    }, 500);
+  }
+
+  // ===== NAV SIDEBAR =====
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+    });
+  });
+
+  // ===== ADMIN PANEL =====
+  function openAdmin() {
+    refreshAdmin();
+    document.getElementById('adminModal').classList.add('open');
+  }
+  function closeAdmin() {
+    document.getElementById('adminModal').classList.remove('open');
+  }
+  document.getElementById('adminModal').addEventListener('click', (e) => {
+    if (e.target.id === 'adminModal') closeAdmin();
+  });
+
+  function switchAdminTab(name) {
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.admin-pane').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.getElementById('pane-' + name).classList.add('active');
+  }
+
+  function loadWaitlist() {
+    try { return JSON.parse(localStorage.getItem(WAITLIST_KEY)) || []; }
+    catch(e) { return []; }
+  }
+
+  function fmtDate(iso) {
+    try {
+      const d = new Date(iso);
+      return d.toLocaleString('tr-TR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+    } catch(e) { return iso; }
+  }
+
+  function refreshAdmin() {
+    const wl = loadWaitlist();
+    const prods = loadProducts();
+
+    document.getElementById('adminWaitlistCount').textContent = wl.length;
+    document.getElementById('adminProductsCount').textContent = prods.length;
+
+    const wlWrap = document.getElementById('adminWaitlistTable');
+    if (wl.length === 0) {
+      wlWrap.innerHTML = `
+        <div class="admin-empty">
+          <div class="admin-empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
+          </div>
+          Henüz waitlist kaydı yok.<br>
+          <span style="font-size:12px;color:var(--text-muted)">Erken Erişim butonuna basıp bir test kaydı oluşturabilirsiniz.</span>
+        </div>
+      `;
+    } else {
+      wlWrap.innerHTML = `
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Tarih</th>
+              <th>Ad / Firma</th>
+              <th>Email</th>
+              <th>Sektör</th>
+              <th>Telefon</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${[...wl].reverse().map(w => `
+              <tr>
+                <td class="muted">${fmtDate(w.ts)}</td>
+                <td><b>${escapeHtml(w.name || '—')}</b></td>
+                <td>${escapeHtml(w.email || '—')}</td>
+                <td>${w.sector ? '<span class="pill">' + escapeHtml(w.sector) + '</span>' : '<span class="muted">—</span>'}</td>
+                <td class="muted">${escapeHtml(w.phone || '—')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    const prodWrap = document.getElementById('adminProductsTable');
+    if (prods.length === 0) {
+      prodWrap.innerHTML = `
+        <div class="admin-empty">
+          <div class="admin-empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7L12 3 4 7l8 4 8-4z"/><path d="M4 7v10l8 4 8-4V7"/></svg>
+          </div>
+          Henüz eklenmiş ürün yok.
+        </div>
+      `;
+    } else {
+      prodWrap.innerHTML = `
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Eklenme</th>
+              <th>Ürün</th>
+              <th>Kategori</th>
+              <th>Fiyat</th>
+              <th>Komisyon</th>
+              <th>Görüntülenme</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${prods.map(p => `
+              <tr>
+                <td class="muted">${fmtDate(new Date(p.createdAt).toISOString())}</td>
+                <td><b>${escapeHtml(p.name)}</b></td>
+                <td><span class="pill">${escapeHtml(p.catShort)}</span></td>
+                <td class="muted">${escapeHtml(p.price)}</td>
+                <td>%${p.commission}</td>
+                <td class="muted">${p.views}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+  }
+
+  function exportCSV() {
+    const wl = loadWaitlist();
+    if (wl.length === 0) { showToast('İndirilecek kayıt yok', 'info'); return; }
+    const header = ['Tarih','Ad/Firma','Email','Sektör','Telefon','Kaynak'];
+    const rows = wl.map(w => [w.ts || '', w.name || '', w.email || '', w.sector || '', w.phone || '', w.source || '']);
+    const csv = [header, ...rows]
+      .map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(','))
+      .join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'vendora_waitlist_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('CSV indirildi', 'success');
+  }
+
+  function copyAllEmails() {
+    const wl = loadWaitlist();
+    if (wl.length === 0) { showToast('Kopyalanacak email yok', 'info'); return; }
+    const emails = wl.map(w => w.email).filter(Boolean).join(', ');
+    navigator.clipboard.writeText(emails).then(
+      () => showToast(wl.length + ' email panoya kopyalandı', 'success'),
+      () => showToast('Kopyalama başarısız', 'info')
+    );
+  }
+
+  function clearAdminData() {
+    if (!confirm('TÜM waitlist kayıtlarını ve ürünleri silmek istediğinize emin misiniz? Geri alınamaz.')) return;
+    localStorage.removeItem(WAITLIST_KEY);
+    localStorage.removeItem(STORAGE_KEY);
+    products = [];
+    renderAll();
+    refreshAdmin();
+    showToast('Tüm veri silindi', 'success');
+  }
+
+  // Keyboard shortcut: Ctrl+Shift+A
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+      e.preventDefault();
+      openAdmin();
+    }
+    if (e.key === 'Escape') {
+      closeAdmin();
+      closeProductModal();
+      closeWaitlist();
+    }
+  });
+
+  // ===== PERSONALIZATION =====
+  function getInitials(name) {
+    if (!name) return 'DÜ';
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return 'DÜ';
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  function getFirstName(name) {
+    if (!name) return '';
+    const trimmed = name.trim();
+    // If it looks like a company name (contains common company markers), use as-is
+    if (/\b(a\.?ş\.?|ltd\.?|şti\.?|inc\.?|llc|sanayi|ticaret)\b/i.test(trimmed)) return trimmed;
+    return trimmed.split(/\s+/)[0];
+  }
+
+  function applyPersonalization() {
+    const name = localStorage.getItem(USER_NAME_KEY);
+    const welcomeEl = document.getElementById('welcomeHeading');
+    const cardNameEl = document.getElementById('userCardName');
+    const cardRoleEl = document.getElementById('userCardRole');
+    const avatarEl = document.getElementById('userAvatar');
+
+    if (name && welcomeEl && cardNameEl && cardRoleEl && avatarEl) {
+      const firstName = getFirstName(name);
+      welcomeEl.innerHTML = 'Hoşgeldin ' + escapeHtml(firstName) + ' 👋';
+      cardNameEl.textContent = name;
+      cardRoleEl.textContent = 'Üretici · Erken Erişim';
+      avatarEl.textContent = getInitials(name);
+    } else if (welcomeEl) {
+      welcomeEl.innerHTML = 'Hoşgeldin 👋';
+    }
+  }
+
+  applyPersonalization();
+
+  // ===== BOOTSTRAP =====
+  renderAll();
+
+  // First-time visitor: show onboarding
+  if (!localStorage.getItem(ONBOARDING_KEY)) {
+    setTimeout(showOnboarding, 600);
+  } else {
+    setTimeout(() => {
+      renderSlogan(0); showSlogan(); restartSloganCycle();
+    }, 900);
+  }
+
+  // Once onboarding closes, kick off slogans
+  document.getElementById('onboardingModal').addEventListener('transitionend', () => {
+    if (!document.getElementById('onboardingModal').classList.contains('open') && !sloganTimer) {
+      setTimeout(() => { renderSlogan(0); showSlogan(); restartSloganCycle(); }, 400);
+    }
+  });
+</script>
+
+</body>
+</html>
